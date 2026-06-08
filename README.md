@@ -1,4 +1,4 @@
-# TradingAgents
+# TradingAgents-Edited
 
 TradingAgents is a multi-agent LLM research framework for financial-market analysis. It coordinates analyst, researcher, trader, risk-management, and portfolio-manager agents to produce a structured trading thesis from market data, fundamentals, news, sentiment, and optional user research focus.
 

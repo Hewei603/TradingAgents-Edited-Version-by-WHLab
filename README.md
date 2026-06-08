@@ -38,8 +38,8 @@ If you use the original TradingAgents research framework in academic work, cite 
 Python 3.10 or newer is required.
 
 ```bash
-git clone https://github.com/<your-user>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/Hewei603/TradingAgents-Edited-Version-by-WHLab.git
+cd TradingAgents-Edited-Version-by-WHLab
 python -m venv .venv
 .venv\Scripts\activate
 pip install .

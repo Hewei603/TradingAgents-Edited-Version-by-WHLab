@@ -8,20 +8,38 @@ from dateutil.relativedelta import relativedelta
 
 from .config import get_config
 from .stockstats_utils import yf_retry
+from .yfinance_config import configure_yfinance_proxy
+
+configure_yfinance_proxy(yf)
 
 
 def _extract_article_data(article: dict) -> dict:
     """Extract article data from yfinance news format (handles nested 'content' structure)."""
+    if not isinstance(article, dict):
+        return {
+            "title": str(article) if article else "No title",
+            "summary": "",
+            "publisher": "Unknown",
+            "link": "",
+            "pub_date": None,
+        }
+
     # Handle nested content structure
     if "content" in article:
         content = article["content"]
+        if not isinstance(content, dict):
+            content = {}
         title = content.get("title", "No title")
         summary = content.get("summary", "")
         provider = content.get("provider", {})
+        if not isinstance(provider, dict):
+            provider = {}
         publisher = provider.get("displayName", "Unknown")
 
         # Get URL from canonicalUrl or clickThroughUrl
         url_obj = content.get("canonicalUrl") or content.get("clickThroughUrl") or {}
+        if not isinstance(url_obj, dict):
+            url_obj = {}
         link = url_obj.get("url", "")
 
         # Get publish date
@@ -147,11 +165,13 @@ def get_global_news_yfinance(
             if search.news:
                 for article in search.news:
                     # Handle both flat and nested structures
-                    if "content" in article:
+                    if isinstance(article, dict) and "content" in article:
                         data = _extract_article_data(article)
                         title = data["title"]
-                    else:
+                    elif isinstance(article, dict):
                         title = article.get("title", "")
+                    else:
+                        title = str(article)
 
                     # Deduplicate by title
                     if title and title not in seen_titles:
@@ -172,7 +192,7 @@ def get_global_news_yfinance(
         news_str = ""
         for article in all_news[:limit]:
             # Handle both flat and nested structures
-            if "content" in article:
+            if isinstance(article, dict) and "content" in article:
                 data = _extract_article_data(article)
                 # Skip articles published after curr_date (look-ahead guard)
                 if data.get("pub_date"):
@@ -183,10 +203,15 @@ def get_global_news_yfinance(
                 publisher = data["publisher"]
                 link = data["link"]
                 summary = data["summary"]
-            else:
+            elif isinstance(article, dict):
                 title = article.get("title", "No title")
                 publisher = article.get("publisher", "Unknown")
                 link = article.get("link", "")
+                summary = ""
+            else:
+                title = str(article)
+                publisher = "Unknown"
+                link = ""
                 summary = ""
 
             news_str += f"### {title} (source: {publisher})\n"

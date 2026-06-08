@@ -48,6 +48,8 @@ class AgentState(MessagesState):
     asset_type: Annotated[str, "Asset type under analysis such as stock or crypto"]
     instrument_context: Annotated[str, "Deterministic ticker identity resolved at run start"]
     trade_date: Annotated[str, "What date we are trading at"]
+    user_prompt: Annotated[str, "Optional user-provided research focus or thesis"]
+    research_focus: Annotated[str, "Normalized optional research focus used by agents"]
 
     sender: Annotated[str, "Agent that sent this message"]
 
@@ -58,6 +60,7 @@ class AgentState(MessagesState):
         str, "Report from the News Researcher of current world affairs"
     ]
     fundamentals_report: Annotated[str, "Report from the Fundamentals Researcher"]
+    narrative_report: Annotated[str, "Report from the Narrative / Human Lens Analyst"]
 
     # researcher team discussion step
     investment_debate_state: Annotated[

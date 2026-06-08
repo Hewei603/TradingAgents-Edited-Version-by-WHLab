@@ -99,10 +99,13 @@ DEFAULT_CONFIG = _apply_env_overrides({
     # Data vendor configuration
     # Category-level configuration (default for all tools in category)
     "data_vendors": {
-        "core_stock_apis": "yfinance",       # Options: alpha_vantage, yfinance
-        "technical_indicators": "yfinance",  # Options: alpha_vantage, yfinance
-        "fundamental_data": "yfinance",      # Options: alpha_vantage, yfinance
-        "news_data": "yfinance",             # Options: alpha_vantage, yfinance
+        # Comma-separated vendor chains are tried left-to-right. Alpha
+        # Vantage is configured as the backup for Yahoo Finance; set
+        # ALPHA_VANTAGE_API_KEY to enable it.
+        "core_stock_apis": "yfinance,alpha_vantage",
+        "technical_indicators": "yfinance,alpha_vantage",
+        "fundamental_data": "yfinance,alpha_vantage",
+        "news_data": "yfinance,alpha_vantage",
     },
     # Tool-level configuration (takes precedence over category-level)
     "tool_vendors": {

@@ -20,6 +20,7 @@ class CryptoAssetModeTests(unittest.TestCase):
             AnalystType.SOCIAL,
             AnalystType.NEWS,
             AnalystType.FUNDAMENTALS,
+            AnalystType.NARRATIVE,
         ]
 
         self.assertEqual(
@@ -28,6 +29,7 @@ class CryptoAssetModeTests(unittest.TestCase):
                 AnalystType.MARKET,
                 AnalystType.SOCIAL,
                 AnalystType.NEWS,
+                AnalystType.NARRATIVE,
             ],
         )
 
@@ -37,6 +39,7 @@ class CryptoAssetModeTests(unittest.TestCase):
             AnalystType.SOCIAL,
             AnalystType.NEWS,
             AnalystType.FUNDAMENTALS,
+            AnalystType.NARRATIVE,
         ]
 
         self.assertEqual(

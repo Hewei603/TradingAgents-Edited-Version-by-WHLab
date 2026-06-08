@@ -30,7 +30,7 @@ class GraphSetup:
         self.analyst_concurrency_limit = analyst_concurrency_limit
 
     def setup_graph(
-        self, selected_analysts=["market", "social", "news", "fundamentals"]
+        self, selected_analysts=["market", "social", "news", "fundamentals", "narrative"]
     ):
         """Set up and compile the agent workflow graph.
 
@@ -40,6 +40,7 @@ class GraphSetup:
                 - "social": Social media analyst
                 - "news": News analyst
                 - "fundamentals": Fundamentals analyst
+                - "narrative": Narrative / Human Lens analyst
         """
         plan = build_analyst_execution_plan(
             selected_analysts,
@@ -51,6 +52,7 @@ class GraphSetup:
             "social": lambda: create_sentiment_analyst(self.quick_thinking_llm),
             "news": lambda: create_news_analyst(self.quick_thinking_llm),
             "fundamentals": lambda: create_fundamentals_analyst(self.quick_thinking_llm),
+            "narrative": lambda: create_narrative_analyst(self.quick_thinking_llm),
         }
 
         # Create researcher and manager nodes

@@ -10,8 +10,11 @@ import os
 from .config import get_config
 from .utils import safe_ticker_component
 from .symbol_utils import normalize_symbol, NoMarketDataError
+from .yfinance_config import configure_yfinance_proxy
 
 logger = logging.getLogger(__name__)
+
+configure_yfinance_proxy(yf)
 
 
 def yf_retry(func, max_retries=3, base_delay=2.0):

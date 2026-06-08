@@ -3,16 +3,14 @@
 import copy
 import unittest
 
-import pytest
-
 import tradingagents.default_config as default_config
+import tradingagents.dataflows.config as dataflows_config
 from tradingagents.dataflows.config import get_config, set_config
 
 
-@pytest.mark.unit
 class DataflowsConfigIsolationTests(unittest.TestCase):
     def setUp(self):
-        set_config(copy.deepcopy(default_config.DEFAULT_CONFIG))
+        dataflows_config._config = copy.deepcopy(default_config.DEFAULT_CONFIG)
 
     def test_get_config_returns_deep_copy(self):
         cfg = get_config()
@@ -20,7 +18,9 @@ class DataflowsConfigIsolationTests(unittest.TestCase):
         cfg["tool_vendors"]["get_stock_data"] = "alpha_vantage"
 
         fresh = get_config()
-        self.assertEqual(fresh["data_vendors"]["core_stock_apis"], "yfinance")
+        self.assertEqual(
+            fresh["data_vendors"]["core_stock_apis"], "yfinance,alpha_vantage"
+        )
         self.assertNotIn("get_stock_data", fresh["tool_vendors"])
 
     def test_set_config_does_not_alias_caller_nested_dicts(self):
@@ -48,9 +48,13 @@ class DataflowsConfigIsolationTests(unittest.TestCase):
 
         fresh = get_config()
         self.assertEqual(fresh["data_vendors"]["core_stock_apis"], "alpha_vantage")
-        self.assertEqual(fresh["data_vendors"]["technical_indicators"], "yfinance")
-        self.assertEqual(fresh["data_vendors"]["fundamental_data"], "yfinance")
-        self.assertEqual(fresh["data_vendors"]["news_data"], "yfinance")
+        self.assertEqual(
+            fresh["data_vendors"]["technical_indicators"], "yfinance,alpha_vantage"
+        )
+        self.assertEqual(
+            fresh["data_vendors"]["fundamental_data"], "yfinance,alpha_vantage"
+        )
+        self.assertEqual(fresh["data_vendors"]["news_data"], "yfinance,alpha_vantage")
 
     def test_nested_dict_updates_merge_one_level_deep(self):
         set_config({"tool_vendors": {"get_stock_data": "alpha_vantage"}})

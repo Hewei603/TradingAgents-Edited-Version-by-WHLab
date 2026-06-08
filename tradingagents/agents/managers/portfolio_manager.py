@@ -31,6 +31,7 @@ def create_portfolio_manager(llm):
         risk_debate_state = state["risk_debate_state"]
         research_plan = state["investment_plan"]
         trader_plan = state["trader_investment_plan"]
+        narrative_report = state.get("narrative_report", "")
 
         past_context = state.get("past_context", "")
         lessons_line = (
@@ -55,13 +56,15 @@ def create_portfolio_manager(llm):
 **Context:**
 - Research Manager's investment plan: **{research_plan}**
 - Trader's transaction proposal: **{trader_plan}**
+- Narrative / Human Lens Report:
+{narrative_report}
 {lessons_line}
 **Risk Analysts Debate History:**
 {history}
 
 ---
 
-Be decisive and ground every conclusion in specific evidence from the analysts.{get_language_instruction()}"""
+Be decisive and ground every conclusion in specific evidence from the analysts. Consider the Narrative / Human Lens Report when judging whether current news is genuinely fundamental, already priced in, old news recycled, or a narrative-driven overreaction. Treat its Narrative Action Lens as advisory narrative-layer sizing guidance, not the final transaction decision. Treat it as one input, not as unquestionable truth.{get_language_instruction()}"""
 
         final_trade_decision = invoke_structured_or_freetext(
             structured_llm,

@@ -22,6 +22,7 @@ class Propagator:
         asset_type: str = "stock",
         past_context: str = "",
         instrument_context: str = "",
+        user_prompt: str = "",
     ) -> Dict[str, Any]:
         """Create the initial state for the agent graph.
 
@@ -37,6 +38,8 @@ class Propagator:
             "asset_type": asset_type,
             "instrument_context": instrument_context,
             "trade_date": str(trade_date),
+            "user_prompt": user_prompt or "",
+            "research_focus": user_prompt or "",
             "past_context": past_context,
             "investment_debate_state": InvestDebateState(
                 {
@@ -66,6 +69,7 @@ class Propagator:
             "fundamentals_report": "",
             "sentiment_report": "",
             "news_report": "",
+            "narrative_report": "",
         }
 
     def get_graph_args(self, callbacks: Optional[List] = None) -> Dict[str, Any]:

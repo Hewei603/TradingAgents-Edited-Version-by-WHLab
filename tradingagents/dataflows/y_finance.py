@@ -6,6 +6,9 @@ import yfinance as yf
 import os
 from .stockstats_utils import StockstatsUtils, _clean_dataframe, yf_retry, load_ohlcv, filter_financials_by_date
 from .symbol_utils import normalize_symbol, NoMarketDataError
+from .yfinance_config import configure_yfinance_proxy
+
+configure_yfinance_proxy(yf)
 
 def get_YFin_data_online(
     symbol: Annotated[str, "ticker symbol of the company"],
@@ -267,6 +270,10 @@ def get_fundamentals(
 
         if not info:
             raise NoMarketDataError(ticker, canonical, "no fundamentals returned")
+        if not isinstance(info, dict):
+            raise NoMarketDataError(
+                ticker, canonical, f"unexpected fundamentals payload: {type(info).__name__}"
+            )
 
         fields = [
             ("Name", info.get("longName")),

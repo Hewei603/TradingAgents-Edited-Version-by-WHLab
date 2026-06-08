@@ -45,6 +45,16 @@ class AnalystExecutionPlanTests(unittest.TestCase):
         self.assertEqual(spec.agent_node, "Sentiment Analyst")
         self.assertEqual(spec.report_key, "sentiment_report")
 
+    def test_narrative_key_uses_narrative_nodes(self):
+        plan = build_analyst_execution_plan(["narrative"])
+        spec = plan.specs[0]
+
+        self.assertEqual(spec.key, "narrative")
+        self.assertEqual(spec.agent_node, "Narrative Analyst")
+        self.assertEqual(spec.tool_node, "tools_narrative")
+        self.assertEqual(spec.clear_node, "Msg Clear Narrative")
+        self.assertEqual(spec.report_key, "narrative_report")
+
 
 class AnalystWallTimeTrackerTests(unittest.TestCase):
     def test_records_wall_time_when_analyst_completes(self):

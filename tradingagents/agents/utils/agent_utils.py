@@ -5,6 +5,8 @@ from typing import Any, Mapping, Optional
 import yfinance as yf
 from langchain_core.messages import HumanMessage, RemoveMessage
 
+from tradingagents.dataflows.yfinance_config import configure_yfinance_proxy
+
 # Import tools from separate utility files
 from tradingagents.agents.utils.core_stock_tools import (
     get_stock_data
@@ -28,6 +30,8 @@ from tradingagents.agents.utils.market_data_validation_tools import (
 )
 
 logger = logging.getLogger(__name__)
+
+configure_yfinance_proxy(yf)
 
 
 def get_language_instruction() -> str:
@@ -75,6 +79,9 @@ def resolve_instrument_identity(ticker: str) -> dict:
         info = yf.Ticker(ticker.upper()).info or {}
     except Exception as exc:  # noqa: BLE001 — fail open, never block the run
         logger.debug("Could not resolve instrument identity for %s: %s", ticker, exc)
+        return {}
+    if not isinstance(info, dict):
+        logger.debug("Unexpected yfinance identity payload for %s: %r", ticker, info)
         return {}
 
     identity: dict[str, str] = {}

@@ -19,6 +19,7 @@ def create_research_manager(llm):
     def research_manager_node(state) -> dict:
         instrument_context = get_instrument_context_from_state(state)
         history = state["investment_debate_state"].get("history", "")
+        narrative_report = state.get("narrative_report", "")
 
         investment_debate_state = state["investment_debate_state"]
 
@@ -40,7 +41,12 @@ Commit to a clear stance whenever the debate's strongest arguments warrant one; 
 ---
 
 **Debate History:**
-{history}""" + get_language_instruction()
+{history}
+
+**Narrative / Human Lens Report:**
+{narrative_report}
+
+Consider the Narrative / Human Lens Report when evaluating whether current news is genuinely fundamental, already priced in, old news recycled, or a narrative-driven overreaction. Treat its Narrative Action Lens as advisory narrative-layer sizing guidance, not the final transaction decision. Treat it as one input, not as unquestionable truth.""" + get_language_instruction()
 
         investment_plan = invoke_structured_or_freetext(
             structured_llm,

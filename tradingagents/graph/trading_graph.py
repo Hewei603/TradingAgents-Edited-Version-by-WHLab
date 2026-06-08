@@ -9,6 +9,10 @@ from typing import Dict, Any, Tuple, List, Optional
 
 import yfinance as yf
 
+from tradingagents.dataflows.yfinance_config import configure_yfinance_proxy
+
+configure_yfinance_proxy(yf)
+
 logger = logging.getLogger(__name__)
 
 from langgraph.prebuilt import ToolNode
@@ -54,7 +58,7 @@ class TradingAgentsGraph:
 
     def __init__(
         self,
-        selected_analysts=["market", "social", "news", "fundamentals"],
+        selected_analysts=["market", "social", "news", "fundamentals", "narrative"],
         debug=False,
         config: Dict[str, Any] = None,
         callbacks: Optional[List] = None,
@@ -198,6 +202,19 @@ class TradingAgentsGraph:
                     get_income_statement,
                 ]
             ),
+            "narrative": ToolNode(
+                [
+                    get_news,
+                    get_global_news,
+                    get_stock_data,
+                    get_indicators,
+                    get_fundamentals,
+                    get_balance_sheet,
+                    get_cashflow,
+                    get_income_statement,
+                    get_insider_transactions,
+                ]
+            ),
         }
 
     def _resolve_benchmark(self, ticker: str) -> str:
@@ -313,7 +330,13 @@ class TradingAgentsGraph:
         identity = resolve_instrument_identity(ticker)
         return build_instrument_context(ticker, asset_type, identity)
 
-    def propagate(self, company_name, trade_date, asset_type: str = "stock"):
+    def propagate(
+        self,
+        company_name,
+        trade_date,
+        asset_type: str = "stock",
+        user_prompt: str = "",
+    ):
         """Run the trading agents graph for a company on a specific date.
 
         ``asset_type`` selects between the stock pipeline (default) and the
@@ -347,14 +370,25 @@ class TradingAgentsGraph:
                 logger.info("Starting fresh for %s on %s", company_name, trade_date)
 
         try:
-            return self._run_graph(company_name, trade_date, asset_type=asset_type)
+            return self._run_graph(
+                company_name,
+                trade_date,
+                asset_type=asset_type,
+                user_prompt=user_prompt,
+            )
         finally:
             if self._checkpointer_ctx is not None:
                 self._checkpointer_ctx.__exit__(None, None, None)
                 self._checkpointer_ctx = None
                 self.graph = self.workflow.compile()
 
-    def _run_graph(self, company_name, trade_date, asset_type: str = "stock"):
+    def _run_graph(
+        self,
+        company_name,
+        trade_date,
+        asset_type: str = "stock",
+        user_prompt: str = "",
+    ):
         """Execute the graph and write the resulting state to disk and memory log."""
         # Initialize state — inject memory log context for PM and the
         # deterministically resolved instrument identity for all agents.
@@ -366,6 +400,7 @@ class TradingAgentsGraph:
             asset_type=asset_type,
             past_context=past_context,
             instrument_context=instrument_context,
+            user_prompt=user_prompt,
         )
         args = self.propagator.get_graph_args()
 
@@ -420,6 +455,9 @@ class TradingAgentsGraph:
             "sentiment_report": final_state["sentiment_report"],
             "news_report": final_state["news_report"],
             "fundamentals_report": final_state["fundamentals_report"],
+            "narrative_report": final_state.get("narrative_report", ""),
+            "user_prompt": final_state.get("user_prompt", ""),
+            "research_focus": final_state.get("research_focus", ""),
             "investment_debate_state": {
                 "bull_history": final_state["investment_debate_state"]["bull_history"],
                 "bear_history": final_state["investment_debate_state"]["bear_history"],
